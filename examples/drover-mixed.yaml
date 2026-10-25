@@ -1,0 +1,27 @@
+# Mixed data sources: every category can use a different backend.
+#
+#   DROVER_DB_URL=postgres://drover:secret@db/drover \
+#   DROVER_AUDIT_DB_URL=postgres://drover:secret@audit-db/drover \
+#   DROVER_ADMIN_TOKEN=... drover -c examples/drover-mixed.yaml
+
+server:
+  bind: "0.0.0.0:8080"
+
+auth:
+  admin_token: "${DROVER_ADMIN_TOKEN}"
+  api_tokens: ["${DROVER_API_TOKEN}"]
+
+log:
+  format: json
+
+datasources:
+  rules:
+    type: postgres
+    url: "${DROVER_DB_URL}"
+    table: drover_rules           # optional, may be schema-qualified (rules.drover_rules)
+    max_connections: 5
+    auto_migrate: true            # create missing tables at startup
+  groups:     { type: json, path: data/groups.json }
+  tests:      { type: yaml, path: data/tests.yaml }
+  config:     { type: postgres, url: "${DROVER_DB_URL}", table: drover_config }
+  executions: { type: postgres, url: "${DROVER_AUDIT_DB_URL}", table: drover_executions, max_connections: 10 }

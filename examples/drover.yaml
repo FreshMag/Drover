@@ -1,0 +1,28 @@
+# Drover bootstrap configuration (file-based example).
+# Relative paths are resolved against the directory of this file.
+#
+#   DROVER_ADMIN_TOKEN=change-me-to-a-long-secret cargo run --release -- -c examples/drover.yaml
+
+server:
+  bind: "127.0.0.1:8080"
+  max_body_bytes: 16777216        # 16 MiB
+  # io_threads: 2                 # async I/O threads; rule evaluation uses `worker_threads`
+  shutdown_grace_secs: 30
+
+auth:
+  # Required for the administration UI/API (served at /admin/).
+  admin_token: "${DROVER_ADMIN_TOKEN:-}"
+  # Bearer tokens for /api/v1 and /metrics. Empty = unauthenticated.
+  api_tokens: []
+
+log:
+  level: info                     # tracing filter, e.g. "drover=debug,info"
+  format: text                    # text | json
+
+# Each category has its own data source: memory | json | yaml | postgres.
+datasources:
+  rules:      { type: yaml, path: data/definitions.yaml }
+  groups:     { type: yaml, path: data/definitions.yaml }
+  tests:      { type: yaml, path: data/tests.yaml }
+  config:     { type: yaml, path: data/config.yaml }
+  executions: { type: json, path: data/executions }     # one file per execution

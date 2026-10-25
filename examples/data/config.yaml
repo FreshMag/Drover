@@ -1,0 +1,23 @@
+config:
+  # Exposed to rules as `config`.
+  - key: min_age
+    value: 18
+    scope: rule
+    description: Minimum customer age.
+  - key: supported_countries
+    value: [IT, FR, DE, ES]
+    scope: rule
+  - key: max_order_total
+    value: 10000
+    scope: rule
+
+  # Drover settings (never visible to rules). Omitted settings use defaults.
+  - key: unknown_group_mode
+    value: strict
+    scope: system
+  - key: startup_tests
+    value: warn
+    scope: system
+  - key: refresh_interval_secs
+    value: 10
+    scope: system

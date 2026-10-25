@@ -1,0 +1,50 @@
+rules:
+  - id: customer.adult
+    language: cel
+    description: Customers must have reached the minimum age.
+    message: customer is under the minimum age
+    source: record.age >= config.min_age
+
+  - id: customer.country
+    language: cel
+    description: Only supported countries are accepted.
+    source: |
+      record.country in config.supported_countries
+        ? true
+        : {"pass": false, "message": "unsupported country " + record.country}
+
+  - id: customer.email
+    language: starlark
+    description: E-mail addresses must look valid.
+    source: |
+      def check(record, config):
+          email = record.get("email", "")
+          if "@" not in email or email.startswith("@") or "." not in email.split("@")[-1]:
+              return {"pass": False, "message": "invalid e-mail address: %r" % email}
+          return True
+
+  - id: order.items
+    language: starlark
+    description: Every order line needs a positive quantity and the total must not exceed the limit.
+    source: |
+      def check(record, config):
+          items = record.get("items", [])
+          if not items:
+              return {"pass": False, "message": "the order has no items"}
+          bad = [i.get("sku", "?") for i in items if i.get("qty", 0) <= 0]
+          if bad:
+              return {"pass": False, "message": "non-positive quantity for: " + ", ".join(bad)}
+          total = 0
+          for i in items:
+              total += i["qty"] * i.get("price", 0)
+          if total > config["max_order_total"]:
+              return {"pass": False, "message": "order total %s exceeds %s" % (total, config["max_order_total"])}
+          return True
+
+groups:
+  - name: onboarding
+    description: Checks run when a customer signs up.
+    rules: [customer.adult, customer.country, customer.email]
+  - name: orders
+    description: Checks run when an order is placed.
+    rules: [order.items]

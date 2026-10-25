@@ -1,0 +1,30 @@
+tests:
+  - id: onboarding.valid-customer
+    tags: [onboarding, smoke]
+    record: {age: 34, country: IT, email: ada@example.com}
+    scope: {type: group, group: onboarding}
+    expect: {outcome: valid}
+
+  - id: onboarding.minor-rejected
+    tags: [onboarding]
+    record: {age: 15, country: IT, email: kid@example.com}
+    scope: {type: group, group: onboarding}
+    expect: {outcome: invalid, rules: [customer.adult], exclusive: true}
+
+  - id: customer.email.malformed
+    tags: [onboarding]
+    record: {email: "not-an-email"}
+    scope: {type: rule, rule: customer.email}
+    expect: {outcome: invalid}
+
+  - id: order.zero-quantity
+    tags: [orders]
+    record: {items: [{sku: A1, qty: 0, price: 5}]}
+    scope: {type: rule, rule: order.items}
+    expect: {outcome: invalid, rules: [order.items]}
+
+  - id: order.ok
+    tags: [orders, smoke]
+    record: {items: [{sku: A1, qty: 2, price: 5}, {sku: B2, qty: 1, price: 30}]}
+    scope: {type: group, group: orders}
+    expect: {outcome: valid}

@@ -1,0 +1,47 @@
+[package]
+name = "drover"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+description = "Lightweight REST API that evaluates CEL and Starlark rules against JSON records"
+license = "Apache-2.0"
+
+[features]
+default = ["postgres", "mimalloc"]
+# mimalloc as the global allocator of the binary. Measured 1.7-3x higher
+# throughput than the macOS system allocator under parallel evaluation.
+mimalloc = ["dep:mimalloc"]
+# PostgreSQL data source support.
+postgres = ["dep:sqlx"]
+# TLS for PostgreSQL connections (rustls + webpki roots).
+postgres-tls = ["postgres", "sqlx/tls-rustls-ring-webpki"]
+
+[dependencies]
+async-trait = "0.1"
+axum = { version = "0.8", default-features = false, features = ["http1", "json", "query", "tokio"] }
+cel = { version = "0.15", default-features = false, features = ["json", "regex", "chrono"] }
+chrono = { version = "0.4", default-features = false, features = ["clock", "serde", "std"] }
+http-body-util = "0.1"
+mimalloc = { version = "0.1", optional = true, default-features = false }
+serde = { version = "1", features = ["derive", "rc"] }
+serde_json = { version = "1", features = ["preserve_order"] }
+serde_yaml_ng = "0.10"
+sqlx = { version = "0.9", default-features = false, features = ["runtime-tokio", "postgres", "json", "chrono", "uuid"], optional = true }
+starlark = "0.14.2"
+thiserror = "2"
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "net", "signal", "sync", "time", "fs", "io-util"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", default-features = false, features = ["env-filter", "fmt", "json", "ansi", "std"] }
+uuid = { version = "1", features = ["v4", "v7", "serde"] }
+
+[dev-dependencies]
+tempfile = "3"
+tower = { version = "0.5", default-features = false, features = ["util"] }
+
+[[bench]]
+name = "engine"
+harness = false
+
+[profile.release]
+lto = "thin"
+codegen-units = 1

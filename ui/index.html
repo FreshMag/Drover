@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Drover Admin</title>
+  <link rel="stylesheet" href="/admin/app.css">
+  <script src="/admin/app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#/rules">Drover</a>
+    <nav id="nav" hidden>
+      <a href="#/rules" data-view="rules">Rules</a>
+      <a href="#/groups" data-view="groups">Groups</a>
+      <a href="#/tests" data-view="tests">Tests</a>
+      <a href="#/config" data-view="config">Configuration</a>
+      <a href="#/status" data-view="status">Status</a>
+    </nav>
+    <span class="spacer"></span>
+    <span id="version" class="muted"></span>
+    <button id="logout" class="ghost" hidden>Sign out</button>
+  </header>
+  <div id="toasts" aria-live="polite"></div>
+  <main id="view">
+    <noscript>The administration interface requires JavaScript.</noscript>
+  </main>
+</body>
+</html>
